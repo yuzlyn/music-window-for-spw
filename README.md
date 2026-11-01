@@ -1,5 +1,7 @@
 # 音乐浮窗（Music Island for SPW）
 
+![音乐浮窗](cover.png)
+
 给 Salt Player for Windows 加一个 Windows 11 / Fluent 风格的桌面音乐浮窗：
 
 - 左侧方形封面 + 右侧实时歌词与进度条
