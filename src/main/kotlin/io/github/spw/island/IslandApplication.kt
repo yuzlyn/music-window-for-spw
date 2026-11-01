@@ -93,9 +93,9 @@ class IslandApplication(
             store.settings.collect {
                 SwingUtilities.invokeLater {
                     applyIslandVisibility()
-                    // 收起样式切换后尺寸要跟着变
+                    // 样式或尺寸配置变化后窗口要跟着变
                     val frame = islandFrame
-                    if (frame != null && controller.collapsed.value && frame.size != targetSize()) {
+                    if (frame != null && frame.size != targetSize()) {
                         applyIslandMode()
                     }
                 }
@@ -163,15 +163,18 @@ class IslandApplication(
         return frame
     }
 
-    private fun targetSize(): Dimension = when {
-        controller.collapsed.value -> if (store.settings.value.collapsedStyle == CollapsedStyle.Capsule) {
-            Dimension(CAPSULE_WIDTH, CAPSULE_HEIGHT)
-        } else {
-            Dimension(COLLAPSED_SIZE, COLLAPSED_SIZE)
-        }
+    private fun targetSize(): Dimension {
+        val settings = store.settings.value
+        return when {
+            controller.collapsed.value -> if (settings.collapsedStyle == CollapsedStyle.Capsule) {
+                Dimension(settings.capsuleWidth, settings.capsuleHeight)
+            } else {
+                Dimension(settings.collapsedSize, settings.collapsedSize)
+            }
 
-        controller.listExpanded.value -> Dimension(EXPANDED_WIDTH, LIST_HEIGHT)
-        else -> Dimension(EXPANDED_WIDTH, EXPANDED_HEIGHT)
+            controller.listExpanded.value -> Dimension(settings.expandedWidth, LIST_HEIGHT)
+            else -> Dimension(settings.expandedWidth, settings.expandedHeight)
+        }
     }
 
     private fun rebuildRenderer() {
@@ -411,10 +414,11 @@ class IslandApplication(
         }
     }
 
-    /** 展开态进度条的命中区域（与布局常量保持一致）。 */
+    /** 展开态进度条的命中区域（随窗口宽度变化）。 */
     private fun isOnProgressBar(x: Int, y: Int): Boolean {
         if (controller.collapsed.value || controller.listExpanded.value) return false
-        return x in 104..384 && y in 56..88
+        val width = store.settings.value.expandedWidth
+        return x in 104..(width - 8) && y in 56..92
     }
 
     /** 把窗口完整压回屏幕范围内；窗口比屏幕还大时贴左上角。 */

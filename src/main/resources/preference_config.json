@@ -86,6 +86,51 @@
           "default_value": false
         },
         {
+          "type": "seekbar",
+          "key": "window.expandedWidth",
+          "title": "展开宽度",
+          "summary": "320 – 560",
+          "default_value": 392.0,
+          "min": 320.0,
+          "max": 560.0
+        },
+        {
+          "type": "seekbar",
+          "key": "window.expandedHeight",
+          "title": "展开高度",
+          "summary": "148 – 260，低于 148 会裁切内容",
+          "default_value": 148.0,
+          "min": 148.0,
+          "max": 260.0
+        },
+        {
+          "type": "seekbar",
+          "key": "window.collapsedSize",
+          "title": "收起尺寸（圆形封面）",
+          "summary": "64 – 160",
+          "default_value": 88.0,
+          "min": 64.0,
+          "max": 160.0
+        },
+        {
+          "type": "seekbar",
+          "key": "window.capsuleWidth",
+          "title": "胶囊宽度",
+          "summary": "160 – 360",
+          "default_value": 220.0,
+          "min": 160.0,
+          "max": 360.0
+        },
+        {
+          "type": "seekbar",
+          "key": "window.capsuleHeight",
+          "title": "胶囊高度",
+          "summary": "40 – 96",
+          "default_value": 56.0,
+          "min": 40.0,
+          "max": 96.0
+        },
+        {
           "type": "list",
           "key": "appearance.collapsedStyle",
           "title": "收起样式",

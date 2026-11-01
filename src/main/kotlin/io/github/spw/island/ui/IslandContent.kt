@@ -85,6 +85,7 @@ fun IslandContent(
                         settings = settings,
                         size = 84.dp,
                         modal = true,
+                        fill = true,
                     )
                 }
 
@@ -122,6 +123,8 @@ private fun ExpandedContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = FluentSpacing.md, vertical = FluentSpacing.md),
+        // 窗口高度可配置，多余空间上下均分，保持垂直居中
+        verticalArrangement = Arrangement.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             CoverBlock(
@@ -430,6 +433,7 @@ private fun CoverBlock(
     settings: IslandSettings,
     size: Dp,
     modal: Boolean = false,
+    fill: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
     val cover by controller.cover.collectAsState()
@@ -458,6 +462,7 @@ private fun CoverBlock(
             title = track?.title.orEmpty(),
             size = size,
             shape = shape,
+            fill = fill,
         )
     }
 }
@@ -468,9 +473,10 @@ private fun CoverArt(
     title: String,
     size: Dp,
     shape: Shape,
+    fill: Boolean = false,
 ) {
     Surface(
-        modifier = Modifier.size(size),
+        modifier = if (fill) Modifier.fillMaxSize() else Modifier.size(size),
         shape = shape,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),

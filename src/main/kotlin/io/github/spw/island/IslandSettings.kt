@@ -78,6 +78,11 @@ data class IslandSettings(
     val alwaysOnTop: Boolean = true,
     val startCollapsed: Boolean = false,
     val collapsedStyle: CollapsedStyle = CollapsedStyle.Cover,
+    val expandedWidth: Int = 392,
+    val expandedHeight: Int = 148,
+    val collapsedSize: Int = 88,
+    val capsuleWidth: Int = 220,
+    val capsuleHeight: Int = 56,
     val opacity: Float = 1f,
     val lyricSize: Int = 18,
 )
@@ -156,6 +161,11 @@ class IslandSettingsStore {
             collapsedStyle = CollapsedStyle.fromValue(
                 readString(KEY_COLLAPSED_STYLE, CollapsedStyle.Cover.value),
             ),
+            expandedWidth = readFloat(KEY_EXPANDED_WIDTH, 392f).toInt().coerceIn(320, 560),
+            expandedHeight = readFloat(KEY_EXPANDED_HEIGHT, 148f).toInt().coerceIn(148, 260),
+            collapsedSize = readFloat(KEY_COLLAPSED_SIZE, 88f).toInt().coerceIn(64, 160),
+            capsuleWidth = readFloat(KEY_CAPSULE_WIDTH, 220f).toInt().coerceIn(160, 360),
+            capsuleHeight = readFloat(KEY_CAPSULE_HEIGHT, 56f).toInt().coerceIn(40, 96),
             opacity = readFloat(KEY_OPACITY, 100f).coerceIn(40f, 100f) / 100f,
             lyricSize = appearance.get(KEY_LYRIC_SIZE, 18f).toInt().coerceIn(12, 28),
         )
@@ -197,6 +207,11 @@ class IslandSettingsStore {
         private const val KEY_ALWAYS_ON_TOP = "window.alwaysOnTop"
         private const val KEY_START_COLLAPSED = "window.startCollapsed"
         private const val KEY_COLLAPSED_STYLE = "appearance.collapsedStyle"
+        private const val KEY_EXPANDED_WIDTH = "window.expandedWidth"
+        private const val KEY_EXPANDED_HEIGHT = "window.expandedHeight"
+        private const val KEY_COLLAPSED_SIZE = "window.collapsedSize"
+        private const val KEY_CAPSULE_WIDTH = "window.capsuleWidth"
+        private const val KEY_CAPSULE_HEIGHT = "window.capsuleHeight"
         private const val KEY_OPACITY = "window.opacity"
         private const val KEY_LYRIC_SIZE = "content.lyricSize"
     }
