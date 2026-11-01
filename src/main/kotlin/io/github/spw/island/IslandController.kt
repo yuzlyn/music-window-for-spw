@@ -15,6 +15,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
 
@@ -48,6 +51,7 @@ class IslandController(private val store: IslandSettingsStore) {
 
     @Volatile
     private var loadedCoverId: String? = null
+    private var syncJob: Job? = null
 
     init {
         collapsed.value = store.settings.value.startCollapsed
@@ -89,12 +93,43 @@ class IslandController(private val store: IslandSettingsStore) {
 
     // endregion
 
+    /** 轮询当前歌曲，切歌后立即重新同步歌词与封面。 */
+    fun startAutoSync() {
+        if (syncJob != null) return
+        syncJob = scope.launch {
+            while (isActive) {
+                delay(1500)
+                runCatching {
+                    val current = WorkshopApi.playback.getCurrentMediaItem()
+                    if (current?.id != track.value?.id) refreshTrack()
+                }
+            }
+        }
+    }
+
+    /** 手动重同步（托盘菜单）。 */
+    fun resyncNow() {
+        lyrics.value = emptyList()
+        currentLine.value = null
+        cover.value = null
+        loadedCoverId = null
+        refreshTrack()
+    }
+
     /** 刷新当前歌曲与封面。 */
     fun refreshTrack() {
         scope.launch {
             val item = runCatching { WorkshopApi.playback.getCurrentMediaItem() }
                 .onFailure { handleFailure("读取当前歌曲失败", it) }
                 .getOrNull()
+
+            // 换歌时先清掉旧的歌词与封面，避免新旧错位
+            if (item?.id != track.value?.id) {
+                lyrics.value = emptyList()
+                currentLine.value = null
+                cover.value = null
+                loadedCoverId = null
+            }
 
             track.value = item
             if (item == null) {
@@ -125,6 +160,9 @@ class IslandController(private val store: IslandSettingsStore) {
         val bitmap = runCatching {
             Image.makeFromEncoded(bytes).toComposeImageBitmap()
         }.getOrNull()
+
+        // 加载期间可能已经切歌，只有仍是当前歌曲才写入
+        if (track.value?.id != id) return
 
         cover.value = bitmap
         loadedCoverId = id

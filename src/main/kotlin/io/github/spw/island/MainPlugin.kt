@@ -38,6 +38,7 @@ class MainPlugin(pluginContext: PluginContext) : SpwPlugin(pluginContext) {
 
         islandApplication = IslandApplication(store, controller).also { it.start() }
         controller.refreshTrack()
+        controller.startAutoSync()
         registerHotkey()
 
         log("音乐浮窗已启动（${store.settings.value.motion.label}）")

@@ -48,6 +48,10 @@ object IslandTray {
             }
             menu.add(library)
 
+            val resync = MenuItem("重新同步歌词与封面")
+            resync.addActionListener { controller.resyncNow() }
+            menu.add(resync)
+
             menu.addSeparator()
 
             val fullscreen = CheckboxMenuItem(
