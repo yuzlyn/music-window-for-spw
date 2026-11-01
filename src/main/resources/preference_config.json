@@ -1,0 +1,135 @@
+{
+  "configs": [
+    {
+      "title": "外观",
+      "config": "config.json",
+      "preferences": [
+        {
+          "type": "list",
+          "key": "appearance.accent",
+          "title": "强调色",
+          "summary": "取自 Windows 11 强调色",
+          "entries": ["蓝", "青", "绿", "橙", "紫", "红"],
+          "entry_values": ["blue", "teal", "green", "orange", "purple", "red"],
+          "default_value": "blue"
+        },
+        {
+          "type": "list",
+          "key": "appearance.mode",
+          "title": "明暗模式",
+          "summary": "跟随系统时使用 Windows 深浅色设置",
+          "entries": ["跟随系统", "浅色", "深色"],
+          "entry_values": ["system", "light", "dark"],
+          "default_value": "system"
+        },
+        {
+          "type": "seekbar",
+          "key": "content.lyricSize",
+          "title": "歌词字号",
+          "default_value": 18.0,
+          "min": 12.0,
+          "max": 28.0
+        },
+        {
+          "type": "switch",
+          "key": "content.showCover",
+          "title": "显示封面",
+          "default_value": true
+        },
+        {
+          "type": "switch",
+          "key": "content.showLyric",
+          "title": "显示歌词行",
+          "summary": "关闭后为纯播放器卡片形态",
+          "default_value": true
+        },
+        {
+          "type": "switch",
+          "key": "content.showTranslation",
+          "title": "显示翻译歌词",
+          "default_value": true
+        }
+      ]
+    },
+    {
+      "title": "行为",
+      "config": "behavior.json",
+      "preferences": [
+        {
+          "type": "list",
+          "key": "behavior.motion",
+          "title": "动画模式",
+          "summary": "性能优先会关闭歌词与封面的过渡动画、停止波浪流动",
+          "entries": ["动画优先", "性能优先"],
+          "entry_values": ["full", "low"],
+          "default_value": "full"
+        },
+        {
+          "type": "list",
+          "key": "behavior.fullscreen",
+          "title": "全屏应用时",
+          "summary": "检测前台窗口是否覆盖整个屏幕（仅 Windows）",
+          "entries": ["保持显示", "自动隐藏"],
+          "entry_values": ["keep", "hide"],
+          "default_value": "keep"
+        },
+        {
+          "type": "switch",
+          "key": "window.alwaysOnTop",
+          "title": "窗口置顶",
+          "default_value": true
+        },
+        {
+          "type": "switch",
+          "key": "window.startCollapsed",
+          "title": "启动时收起",
+          "default_value": false
+        },
+        {
+          "type": "list",
+          "key": "appearance.collapsedStyle",
+          "title": "收起样式",
+          "summary": "专辑封面为圆形；胶囊为长条，左封面右歌词，宽度更小",
+          "entries": ["专辑封面", "胶囊歌词"],
+          "entry_values": ["cover", "capsule"],
+          "default_value": "cover"
+        },
+        {
+          "type": "seekbar",
+          "key": "window.opacity",
+          "title": "窗口不透明度",
+          "summary": "仅在形状裁剪不可用、退回透明窗口时生效",
+          "default_value": 100.0,
+          "min": 40.0,
+          "max": 100.0
+        }
+      ]
+    },
+    {
+      "title": "操作",
+      "config": "actions.json",
+      "preferences": [
+        {
+          "type": "button",
+          "title": "显示悬浮窗",
+          "summary": "被隐藏或全屏隐藏后手动唤出",
+          "arrow_type": "none",
+          "on_click": "io.github.spw.island.IslandActions.showIsland"
+        },
+        {
+          "type": "button",
+          "title": "打开曲库窗口",
+          "arrow_type": "link",
+          "on_click": "io.github.spw.island.IslandActions.openLibrary"
+        },
+        {
+          "type": "button",
+          "title": "查看当前状态",
+          "summary": "显示配色、动画模式与全屏策略",
+          "arrow_type": "none",
+          "on_click": "io.github.spw.island.IslandActions.showStatus"
+        }
+      ]
+    }
+  ]
+}
