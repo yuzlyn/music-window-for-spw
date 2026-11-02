@@ -180,13 +180,18 @@ class IslandController(private val store: IslandSettingsStore) {
     }
 
     private suspend fun loadCover(id: String) {
-        if (!hasLibraryPermission()) return
+        if (!hasLibraryPermission()) {
+            IslandLog.warn("无 library-read 权限，跳过封面 id=$id")
+            return
+        }
 
+        IslandLog.info("封面请求 id=$id")
         val bytes = runCatching {
             WorkshopApi.library.getCoverById(id).toCompletableFuture().get()
         }.onFailure { handleFailure("读取封面失败", it) }.getOrNull()
 
         if (bytes == null || bytes.isEmpty()) {
+            IslandLog.warn("封面为空 id=$id")
             cover.value = null
             loadedCoverId = id
             return
@@ -194,13 +199,17 @@ class IslandController(private val store: IslandSettingsStore) {
 
         val bitmap = runCatching {
             Image.makeFromEncoded(bytes).toComposeImageBitmap()
-        }.getOrNull()
+        }.onFailure { IslandLog.warn("封面解码失败 id=$id：${it.message}") }.getOrNull()
 
         // 加载期间可能已经切歌，只有仍是当前歌曲才写入
-        if (track.value?.id != id) return
+        if (track.value?.id != id) {
+            IslandLog.info("封面丢弃（已切歌）id=$id")
+            return
+        }
 
         cover.value = bitmap
         loadedCoverId = id
+        IslandLog.info("封面写入 id=$id bytes=${bytes.size} 解码=${bitmap != null}")
     }
 
     /** 按比例跳转；用于进度条点击与拖动。 */
