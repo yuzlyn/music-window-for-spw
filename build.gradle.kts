@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "io.github.spw"
-version = "3.7.3"
+version = "3.7.4"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_25

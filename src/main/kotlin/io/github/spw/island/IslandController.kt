@@ -53,6 +53,7 @@ class IslandController(private val store: IslandSettingsStore) {
     private var loadedCoverId: String? = null
     private var syncJob: Job? = null
     private var lyricsGateUntil = 0L
+    private var lastCommandAt = 0L
 
     init {
         collapsed.value = store.settings.value.startCollapsed
@@ -63,6 +64,27 @@ class IslandController(private val store: IslandSettingsStore) {
     fun onIsPlayingChanged(playing: Boolean) {
         isPlaying.value = playing
         if (playing) refreshTrack()
+    }
+
+    /**
+     * 播放/暂停切换。
+     *
+     * 先本地翻转状态再调 API：宿主的回调有延迟，等回调会让按钮"点了没反应"，
+     * 250ms 防抖避免连点产生 pause→play 抖动。
+     */
+    fun togglePlayPause() {
+        val now = System.currentTimeMillis()
+        if (now - lastCommandAt < 250) return
+        lastCommandAt = now
+
+        val playing = isPlaying.value
+        isPlaying.value = !playing
+        runCatching {
+            if (playing) WorkshopApi.playback.pause() else WorkshopApi.playback.play()
+        }.onFailure {
+            isPlaying.value = playing
+            handleFailure("切换播放状态失败", it)
+        }
     }
 
     fun onPositionUpdated(position: Long) {

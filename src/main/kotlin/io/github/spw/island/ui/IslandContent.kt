@@ -373,11 +373,7 @@ private fun ControlsRow(controller: IslandController) {
                 color = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(32.dp),
-                onClick = {
-                    runCatching {
-                        if (isPlaying) WorkshopApi.playback.pause() else WorkshopApi.playback.play()
-                    }
-                },
+                onClick = { controller.togglePlayPause() },
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     IslandIconView(
