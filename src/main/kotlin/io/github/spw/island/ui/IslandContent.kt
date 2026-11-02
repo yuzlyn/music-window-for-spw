@@ -254,10 +254,15 @@ private fun LyricOrTitle(
     val track by controller.track.collectAsState()
     val line by controller.currentLine.collectAsState()
 
+    // 命中区固定成"两行歌词"的高度：内容切换不会改变尺寸，避免指针在边界处反复进出导致闪烁
+    val hoverHeight = ((settings.lyricSize + 6) * 2).dp.coerceAtLeast(44.dp)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(hoverHeight)
             .hoverable(interaction),
+        contentAlignment = Alignment.CenterStart,
     ) {
         if (hovered || !settings.showLyric) {
             Column {
