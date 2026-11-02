@@ -52,6 +52,7 @@ class IslandController(private val store: IslandSettingsStore) {
     @Volatile
     private var loadedCoverId: String? = null
     private var syncJob: Job? = null
+    private var lyricsGateUntil = 0L
 
     init {
         collapsed.value = store.settings.value.startCollapsed
@@ -70,10 +71,13 @@ class IslandController(private val store: IslandSettingsStore) {
     }
 
     fun onLyricsLineUpdated(line: LyricsLine?) {
+        // 换歌瞬间可能收到上一首的残留事件，直接丢弃
+        if (System.currentTimeMillis() < lyricsGateUntil) return
         currentLine.value = line
     }
 
     fun onLyricsLinesUpdated(lines: List<LyricsLine>) {
+        if (System.currentTimeMillis() < lyricsGateUntil) return
         lyrics.value = lines
         currentLine.value = null
         syncLineFromTimeline(positionMs.value)
@@ -86,8 +90,17 @@ class IslandController(private val store: IslandSettingsStore) {
 
     private fun syncLineFromTimeline(position: Long) {
         val timeline = lyrics.value
-        if (timeline.isEmpty()) return
-        val line = timeline.lastOrNull { it.startTime <= position } ?: timeline.first()
+        if (timeline.isEmpty()) {
+            // 没有歌词时不能保留上一行，否则会出现"上一首的歌词挂在这一首"
+            currentLine.value = null
+            return
+        }
+        val line = timeline.lastOrNull { it.startTime <= position }
+        if (line == null) {
+            // 还没到第一句（前奏/乐器段）
+            currentLine.value = null
+            return
+        }
         currentLine.value = line
     }
 
@@ -123,8 +136,10 @@ class IslandController(private val store: IslandSettingsStore) {
                 .onFailure { handleFailure("读取当前歌曲失败", it) }
                 .getOrNull()
 
-            // 换歌时先清掉旧的歌词与封面，避免新旧错位
+            // 换歌时先清掉旧的歌词与封面，避免新旧错位；
+            // 并开启 800ms 的门闩，丢弃上一首迟到的歌词事件
             if (item?.id != track.value?.id) {
+                lyricsGateUntil = System.currentTimeMillis() + 800
                 lyrics.value = emptyList()
                 currentLine.value = null
                 cover.value = null

@@ -131,6 +131,15 @@
           "max": 96.0
         },
         {
+          "type": "seekbar",
+          "key": "behavior.autoCollapseSeconds",
+          "title": "自动收起时间",
+          "summary": "展开后多少秒自动收起；0 表示不自动收起",
+          "default_value": 0.0,
+          "min": 0.0,
+          "max": 120.0
+        },
+        {
           "type": "list",
           "key": "appearance.collapsedStyle",
           "title": "收起样式",

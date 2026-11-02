@@ -38,6 +38,9 @@ object LibraryWindow {
         }
     }
 
+    /** 曲库窗口是否处于显示状态，用于暂停自动收起。 */
+    fun isOpen(): Boolean = frame?.isVisible == true
+
     fun close() {
         SwingUtilities.invokeLater {
             runCatching { frame?.dispose() }

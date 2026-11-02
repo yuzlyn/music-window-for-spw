@@ -83,6 +83,8 @@ data class IslandSettings(
     val collapsedSize: Int = 88,
     val capsuleWidth: Int = 220,
     val capsuleHeight: Int = 56,
+    /** 展开后多少秒自动收起；0 表示不自动收起。 */
+    val autoCollapseSeconds: Int = 0,
     val opacity: Float = 1f,
     val lyricSize: Int = 18,
 )
@@ -166,6 +168,7 @@ class IslandSettingsStore {
             collapsedSize = readFloat(KEY_COLLAPSED_SIZE, 88f).toInt().coerceIn(64, 160),
             capsuleWidth = readFloat(KEY_CAPSULE_WIDTH, 220f).toInt().coerceIn(160, 360),
             capsuleHeight = readFloat(KEY_CAPSULE_HEIGHT, 56f).toInt().coerceIn(40, 96),
+            autoCollapseSeconds = readFloat(KEY_AUTO_COLLAPSE, 0f).toInt().coerceIn(0, 120),
             opacity = readFloat(KEY_OPACITY, 100f).coerceIn(40f, 100f) / 100f,
             lyricSize = appearance.get(KEY_LYRIC_SIZE, 18f).toInt().coerceIn(12, 28),
         )
@@ -212,6 +215,7 @@ class IslandSettingsStore {
         private const val KEY_COLLAPSED_SIZE = "window.collapsedSize"
         private const val KEY_CAPSULE_WIDTH = "window.capsuleWidth"
         private const val KEY_CAPSULE_HEIGHT = "window.capsuleHeight"
+        private const val KEY_AUTO_COLLAPSE = "behavior.autoCollapseSeconds"
         private const val KEY_OPACITY = "window.opacity"
         private const val KEY_LYRIC_SIZE = "content.lyricSize"
     }

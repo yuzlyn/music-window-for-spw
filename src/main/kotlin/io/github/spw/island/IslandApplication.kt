@@ -59,6 +59,7 @@ class IslandApplication(
     private var frameTimer: Timer? = null
     private var resizeTimer: Timer? = null
     private var revealTimer: Timer? = null
+    private var autoCollapseTimer: Timer? = null
     private var watchJob: Job? = null
 
     private var dragging = false
@@ -75,6 +76,7 @@ class IslandApplication(
             startFrameLoop()
             applyIslandVisibility()
             IslandTray.install(store, controller, frame)
+            restartAutoCollapse()
         }
 
         watchJob = scope.launch {
@@ -98,6 +100,7 @@ class IslandApplication(
                     if (frame != null && frame.size != targetSize()) {
                         applyIslandMode()
                     }
+                    restartAutoCollapse()
                 }
             }
         }
@@ -118,6 +121,8 @@ class IslandApplication(
         watchJob?.cancel()
         scope.cancel()
         frameTimer?.stop()
+        autoCollapseTimer?.stop()
+        autoCollapseTimer = null
         resizeTimer?.stop()
         frameTimer = null
         resizeTimer = null
@@ -195,6 +200,8 @@ class IslandApplication(
 
     private fun startFrameLoop() {
         frameTimer?.stop()
+        autoCollapseTimer?.stop()
+        autoCollapseTimer = null
         frameTimer = Timer(16) {
             val scene = renderer ?: return@Timer
             if (!scene.invalidated) return@Timer
@@ -249,6 +256,27 @@ class IslandApplication(
                 revealTimer?.stop()
                 surface?.setReveal(null)
             }
+            restartAutoCollapse()
+        }
+    }
+
+    /** 展开 N 秒后自动收起；0 表示关闭。鼠标操作会重新计时。 */
+    private fun restartAutoCollapse() {
+        autoCollapseTimer?.stop()
+        autoCollapseTimer = null
+
+        val seconds = store.settings.value.autoCollapseSeconds
+        if (seconds <= 0) return
+        if (controller.collapsed.value) return
+
+        autoCollapseTimer = Timer(seconds * 1000) {
+            autoCollapseTimer = null
+            if (!controller.collapsed.value && !dragging && !LibraryWindow.isOpen()) {
+                controller.toggleCollapsed()
+            }
+        }.apply {
+            isRepeats = false
+            start()
         }
     }
 
@@ -294,6 +322,7 @@ class IslandApplication(
                 dragging = false
                 pressOnProgress = isOnProgressBar(event.x, event.y)
                 renderer?.press(event.x.toFloat(), event.y.toFloat(), System.currentTimeMillis())
+                restartAutoCollapse()
             }
 
             override fun mouseReleased(event: MouseEvent) {
