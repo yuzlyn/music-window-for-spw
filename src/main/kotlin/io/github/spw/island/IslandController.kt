@@ -90,11 +90,9 @@ class IslandController(private val store: IslandSettingsStore) {
 
     private fun syncLineFromTimeline(position: Long) {
         val timeline = lyrics.value
-        if (timeline.isEmpty()) {
-            // 没有歌词时不能保留上一行，否则会出现"上一首的歌词挂在这一首"
-            currentLine.value = null
-            return
-        }
+        // 宿主多数歌曲只通过单行回调推歌词，此时没有整表，
+        // 不能在这里清空，否则每秒的位置更新会把刚收到的歌词抹掉。
+        if (timeline.isEmpty()) return
         val line = timeline.lastOrNull { it.startTime <= position }
         if (line == null) {
             // 还没到第一句（前奏/乐器段）
@@ -139,7 +137,7 @@ class IslandController(private val store: IslandSettingsStore) {
             // 换歌时先清掉旧的歌词与封面，避免新旧错位；
             // 并开启 800ms 的门闩，丢弃上一首迟到的歌词事件
             if (item?.id != track.value?.id) {
-                lyricsGateUntil = System.currentTimeMillis() + 800
+                lyricsGateUntil = System.currentTimeMillis() + 500
                 lyrics.value = emptyList()
                 currentLine.value = null
                 cover.value = null
